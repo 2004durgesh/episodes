@@ -23,23 +23,6 @@ export class AnimeKaiProvider extends Provider {
   }
 
   async getMapping(title: ITitle): Promise<Mappings> {
-    // const { data } = await axios.get("https://animekai.to", {
-    //   headers: {
-    //     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0",
-    //     "Accept": "text/html, */*; q=0.01",
-    //     "Accept-Language": "en-US,en;q=0.5",
-    //     "Sec-GPC": "1",
-    //     "Sec-Fetch-Dest": "empty",
-    //     "Sec-Fetch-Mode": "cors",
-    //     "Sec-Fetch-Site": "same-origin",
-    //     "Priority": "u=0",
-    //     "Pragma": "no-cache",
-    //     "Cache-Control": "no-cache",
-    //     "Referer": "https://animekai.to/",
-    //     "Cookie": "usertype=guest; session=hxYne0BNXguMc8zK1FHqQKXPmmoANzBBOuNPM64a; cf_clearance=WfGWV1bKGAaNySbh.yzCyuobBOtjg0ncfPwMhtsvsrs-1737611098-1.2.1.1-zWHcaytuokjFTKbCAxnSPDc_BWAeubpf9TAAVfuJ2vZuyYXByqZBXAZDl_VILwkO5NOLck8N0C4uQr4yGLbXRcZ_7jfWUvfPGayTADQLuh.SH.7bvhC7DmxrMGZ8SW.hGKEQzRJf8N7h6ZZ27GMyqOfz1zfrOiu9W30DhEtW2N7FAXUPrdolyKjCsP1AK3DqsDtYOiiPNLnu47l.zxK80XogfBRQkiGecCBaeDOJHenjn._Zgykkr.F_2bj2C3AS3A5mCpZSlWK5lqhV6jQSQLF9wKWitHye39V.6NoE3RE"
-    //   },
-    // });
-    // console.log(data);
     try {
       // Run searches in parallel
       const searchTerm =

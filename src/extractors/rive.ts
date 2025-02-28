@@ -24,7 +24,7 @@ export async function getRiveStream(
     "asiacloud",
     "kage",
   ];
-  const baseUrl = "https://rivestream.live";
+  const baseUrl = "https://rivestream.net";
   // console.log(tmdbId, episode, season, type);
   const route =
     type === "series" || type === "tv"
