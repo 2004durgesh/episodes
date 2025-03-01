@@ -1,39 +1,41 @@
 import { getProvider } from "../providers/index";
-import { CombineEpisodeMeta, EpisodeImage } from "../utils/EpisodeFunctions";
+import { CombineEpisodeMeta, EpisodeSchema } from "../utils/EpisodeFunctions";
 import { getMappings } from "./mappings";
-import { IAnimeEpisode, META } from "@consumet/extensions/dist";
-import Zoro from "@consumet/extensions/dist/providers/anime/zoro";
+import { IAnimeEpisode } from "@consumet/extensions/dist";
 
 interface EpisodeResponse {
   sub: IAnimeEpisode[];
   dub: IAnimeEpisode[];
 }
 
-export interface UnifiedEpisode extends EpisodeImage {
+export interface UnifiedEpisode extends EpisodeSchema {
   dubId?: string;
   isDub: boolean;
   dubUrl?: string;
 }
-
-interface MetaResponse {
-  episodes: {
-    [key: string]: IAnimeEpisode;
-  };
+interface MetaMappings{
+  [key:string]:any
+}
+export interface MetaResponse {
+  episodes: IAnimeEpisode[];
+  mappings?: MetaMappings;
 }
 
-const meta = new META.Anilist(
-  new Zoro()
-);
+interface EpisodeDataResult {
+  episodes: UnifiedEpisode[] | null;
+  mappings?: MetaMappings;
+}
 
-async function fetchEpisodeMeta(id: string): Promise<IAnimeEpisode[]> {
+
+export async function fetchEpisodeMeta(id: string): Promise<MetaResponse> {
   try {
     const res = await fetch(`https://api.ani.zip/mappings?anilist_id=${id}`);
-    const data: MetaResponse = await res.json();
-    const episodesArray = Object.values(data?.episodes);
-    return episodesArray || [];
+    const data = await res.json();
+    const episodesArray = Object.values(data?.episodes || {}) as IAnimeEpisode[];
+    return { episodes: episodesArray || [], mappings: data?.mappings };
   } catch (error) {
     console.error("Error fetching and processing meta:", error);
-    return [];
+    return { episodes: [] };
   }
 }
 
@@ -103,15 +105,16 @@ export const fetchEpisodesData = async (
   );
   // console.log("Results:", results[0]);
 
-  if (episodeMeta?.length > 0 && results[0]) {
-    return await CombineEpisodeMeta(results[0], episodeMeta);
+  if (episodeMeta?.episodes.length > 0 && results[0]) {
+    return await CombineEpisodeMeta(results[0], episodeMeta.episodes);
   }
   return results[0] || [];
 };
 
 export const getEpisodes = async (id: string): Promise<UnifiedEpisode[]> => {
   try {
-    return await fetchEpisodesData(id);
+    const data = await fetchEpisodesData(id);
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error("Error fetching episodes:", error);
     return [];
@@ -120,8 +123,8 @@ export const getEpisodes = async (id: string): Promise<UnifiedEpisode[]> => {
 
 
 function unifyEpisodes(
-  sub: EpisodeImage[],
-  dub: EpisodeImage[],
+  sub: EpisodeSchema[],
+  dub: EpisodeSchema[],
   anilistId:string
 ): UnifiedEpisode[] {
   const unifiedEpisodes: UnifiedEpisode[] = [];
