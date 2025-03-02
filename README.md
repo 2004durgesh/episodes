@@ -32,6 +32,14 @@ npm run dev
 
 ## 📡 API Endpoints
 
+### 🎯 Fetch Mappings
+
+**GET**
+
+```sh
+http://localhost:3001/anime/mappings/{anilistId}
+```
+
 ### 🎯 Fetch Episodes
 
 **GET**

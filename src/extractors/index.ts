@@ -1,7 +1,7 @@
 import { Source } from "../utils/types";
 import { multiExtractor } from "./multi";
 import { stableExtractor } from "./stable";
-import { getRiveStream } from "./rive";
+import { getRiveNonEmbedStream } from "./rive-nonembed";
 import axios from "axios";
 
 const autoembed = "YXV0b2VtYmVkLmNj";
@@ -15,7 +15,7 @@ export const allGetStream = async (
     const { season, episode, tmdbId } = JSON.parse(id);
 
     ///// rive
-    await getRiveStream(tmdbId, episode, season, type, streams);
+    await getRiveNonEmbedStream(tmdbId, episode, season, type, streams);
 
     ///// autoembed
     // server1

@@ -1,6 +1,6 @@
-import { UnifiedEpisode } from "../anime/episode";
+import { MetaResponse, UnifiedEpisode } from "../anime/episode";
 
-export interface EpisodeImage {
+export interface EpisodeSchema {
   number: number;
   episode?: number;
   img?: string;
@@ -17,6 +17,9 @@ export interface EpisodeImage {
   description?: string;
   overview?: string;
   summary?: string;
+  mappings?: {
+    [key: string]: any;
+  };
   [key: string]: any;
 }
 
@@ -27,9 +30,9 @@ interface ProvidersMapResult {
 
 export async function CombineEpisodeMeta(
   episodeData: UnifiedEpisode[],
-  imageData: EpisodeImage[]
+  imageData: EpisodeSchema[]
 ): Promise<UnifiedEpisode[]> {
-  const episodeImages: { [key: number]: EpisodeImage } = {};
+  const episodeImages: { [key: number]: EpisodeSchema } = {};
 
   imageData.forEach((image) => {
     episodeImages[image.number || image.episode || 0] = image;
@@ -62,7 +65,7 @@ export async function CombineEpisodeMeta(
         episodeImages[episodeNum].overview ||
         episodeImages[episodeNum].summary;
 
-      Object.assign(episode, { image, title, description, airDate });
+      Object.assign(episode, { image, title, description, airDate});
     }
   }
   return episodeData;

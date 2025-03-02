@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { getProvider } from "../providers";
+import { getProvider } from "../../providers";
 import { PROVIDERS_LIST } from "@consumet/extensions/dist";
 
 const router = express.Router();
@@ -39,9 +39,11 @@ router.get("/episodes/:id", async (req: any, res: any) => {
         });
       }
     }
-    const episodesData = await getProvider("tmdb").fetchEpisodes(id,
+    const episodesData = await getProvider("tmdb").fetchEpisodes(
+      id,
       type,
-      provider);
+      provider
+    );
 
     return res.status(200).json(episodesData);
   } catch (error) {
@@ -68,7 +70,8 @@ router.get("/watch/:tmdbId", async (req: any, res: any) => {
     if (!type || !seasonNumber || !episodeNumber || !server) {
       return res.status(400).json({
         success: false,
-        error: "Missing either type, seasonNumber, episodeNumber or server parameter",
+        error:
+          "Missing either type, seasonNumber, episodeNumber or server parameter",
       });
     }
 
