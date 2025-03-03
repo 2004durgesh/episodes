@@ -5,17 +5,30 @@ import { fetchEpisodeMeta, fetchEpisodesData } from "../anime/episode";
 const router = express.Router();
 
 router.get("/", (req: Request, res: Response) => {
-  res.json([{ routes: ["/episodes/:id"] }]);
+  res.json([{ routes: ["/episodes/:id","/mappings/:idType/:id"] }]);
 });
 
-router.get("/mappings/:id", async (req: any, res: any) => {
+router.get("/mappings/:idType/:id", async (req: any, res: any) => {
   try {
-    const { id } = req.params;
+    const { idType, id } = req.params;
 
-    if (!id) {
+    if (!idType || !id) {
       return res.status(400).json({
         success: false,
-        error: "Missing required ID parameter",
+        error: "Missing required parameters: idType and id"
+      });
+    }
+    
+    const supportedTypes = [
+      "anilist_id", "mal_id", "kitsu_id", "animeplanet_id",
+      "anisearch_id", "anidb_id", "notifymoe_id", "livechart_id", 
+      "thetvdb_id", "imdb_id", "themoviedb_id"
+    ];
+    
+    if (!supportedTypes.includes(idType)) {
+      return res.status(400).json({
+        success: false,
+        error: `Unsupported ID type: ${idType}, supported types: ${supportedTypes.join(", ")}`
       });
     }
 

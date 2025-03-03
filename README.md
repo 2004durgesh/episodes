@@ -37,15 +37,28 @@ npm run dev
 **GET**
 
 ```sh
-http://localhost:3001/anime/mappings/{anilistId}
+http://localhost:3001/anime/mappings/{idType}/{id}
 ```
+
+Supported ID types:
+- anilist_id
+- mal_id
+- kitsu_id
+- animeplanet_id
+- anisearch_id
+- anidb_id
+- notifymoe_id
+- livechart_id
+- thetvdb_id
+- imdb_id
+- themoviedb_id
 
 ### 🎯 Fetch Episodes
 
 **GET**
 
 ```sh
-http://localhost:3001/anime/episodes/{anilistId}?provider=gogoanime # or zoro
+http://localhost:3001/anime/episodes/{anilistId}?provider=gogoanime # or zoro | animekai
 ```
 
 **GET**
