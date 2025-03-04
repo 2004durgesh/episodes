@@ -1,5 +1,6 @@
 import { getProvider } from "../providers/index";
 import { CombineEpisodeMeta, EpisodeSchema } from "../utils/EpisodeFunctions";
+import { MetaProvider } from "../utils/types";
 import { getMappings } from "./mappings";
 import { IAnimeEpisode } from "@consumet/extensions/dist";
 
@@ -13,25 +14,32 @@ export interface UnifiedEpisode extends EpisodeSchema {
   isDub: boolean;
   dubUrl?: string;
 }
-interface MetaMappings{
-  [key:string]:any
+interface MetaMappings {
+  [key: string]: any;
 }
 export interface MetaResponse {
   episodes: IAnimeEpisode[];
   mappings?: MetaMappings;
 }
 
-interface EpisodeDataResult {
-  episodes: UnifiedEpisode[] | null;
-  mappings?: MetaMappings;
-}
-
-
-export async function fetchEpisodeMeta(id: string): Promise<MetaResponse> {
+export async function fetchEpisodeMeta(
+  id: string,
+  metaProvider?: MetaProvider
+): Promise<MetaResponse> {
   try {
-    const res = await fetch(`https://api.ani.zip/mappings?anilist_id=${id}`);
+    let url;
+    if (metaProvider === "anilist") {
+      url = `https://api.ani.zip/mappings?anilist_id=${id}`;
+    } else if (metaProvider === "mal") {
+      url = `https://api.ani.zip/mappings?mal_id=${id}`;
+    } else {
+      url = `https://api.ani.zip/mappings?${metaProvider}=${id}`;
+    }
+    const res = await fetch(url);
     const data = await res.json();
-    const episodesArray = Object.values(data?.episodes || {}) as IAnimeEpisode[];
+    const episodesArray = Object.values(
+      data?.episodes || {}
+    ) as IAnimeEpisode[];
     return { episodes: episodesArray || [], mappings: data?.mappings };
   } catch (error) {
     console.error("Error fetching and processing meta:", error);
@@ -41,12 +49,13 @@ export async function fetchEpisodeMeta(id: string): Promise<MetaResponse> {
 
 export const fetchEpisodesData = async (
   id: string,
+  metaProvider: MetaProvider,
   preferredProvider: string | null = null
 ): Promise<UnifiedEpisode[]> => {
   // Run mappings and meta fetch in parallel
   const [mappings, episodeMeta] = await Promise.all([
-    getMappings(id, preferredProvider || ""),
-    fetchEpisodeMeta(id),
+    getMappings(id, metaProvider, preferredProvider || ""),
+    fetchEpisodeMeta(id, metaProvider),
   ]);
 
   if (!mappings) return [];
@@ -88,12 +97,15 @@ export const fetchEpisodesData = async (
           if (providerMappings.dub) {
             episodes.dub = await provider.fetchEpisodes(providerMappings.dub);
           }
-          if(preferredProvider==="zoro" || preferredProvider==="animekai"){
+          if (
+            preferredProvider === "zoro" ||
+            preferredProvider === "animekai"
+          ) {
             episodes.dub = await provider.fetchEpisodes(providerMappings.sub);
           }
         })(),
       ]);
-      const unifiedEpisodes = unifyEpisodes(episodes.sub, episodes.dub,id);
+      const unifiedEpisodes = unifyEpisodes(episodes.sub, episodes.dub, id);
       if (episodes.sub.length > 0 || episodes.dub.length > 0) {
         return unifiedEpisodes;
       }
@@ -111,21 +123,20 @@ export const fetchEpisodesData = async (
   return results[0] || [];
 };
 
-export const getEpisodes = async (id: string): Promise<UnifiedEpisode[]> => {
-  try {
-    const data = await fetchEpisodesData(id);
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error("Error fetching episodes:", error);
-    return [];
-  }
-};
-
+// export const getEpisodes = async (id: string): Promise<UnifiedEpisode[]> => {
+//   try {
+//     const data = await fetchEpisodesData(id);
+//     return Array.isArray(data) ? data : [];
+//   } catch (error) {
+//     console.error("Error fetching episodes:", error);
+//     return [];
+//   }
+// };
 
 function unifyEpisodes(
   sub: EpisodeSchema[],
   dub: EpisodeSchema[],
-  anilistId:string
+  anilistId: string
 ): UnifiedEpisode[] {
   const unifiedEpisodes: UnifiedEpisode[] = [];
 
@@ -141,10 +152,10 @@ function unifyEpisodes(
       number: subEpisode.number,
       url: subEpisode.url,
       dubUrl: matchingDub?.url,
-      image: subEpisode.image ||matchingDub?.image,
+      image: subEpisode.image || matchingDub?.image,
       title: matchingDub?.title || subEpisode.title,
-      description: subEpisode.description ||matchingDub?.description,
-      airDate: subEpisode.airDate || matchingDub?.airDate ,
+      description: subEpisode.description || matchingDub?.description,
+      airDate: subEpisode.airDate || matchingDub?.airDate,
     });
 
     // Remove the matched dub to avoid duplicates in the next loop

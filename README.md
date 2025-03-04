@@ -58,7 +58,11 @@ Supported ID types:
 **GET**
 
 ```sh
-http://localhost:3001/anime/episodes/{anilistId}?provider=gogoanime # or zoro | animekai
+http://localhost:3001/anime/episodes/anilist/{anilistId}?provider=gogoanime # or zoro | animekai
+```
+
+```sh
+http://localhost:3001/anime/episodes/mal/{malId}?provider=gogoanime # or zoro | animekai
 ```
 
 **GET**
@@ -74,7 +78,7 @@ http://localhost:3001/movies/episodes/{tmdbId}?type={movie} # or tv
 **GET**
 
 ```
-http://localhost:3001/movies/watch/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&server={server}
+http://localhost:3001/movies/tmdb/watch/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&server={server}
 ```
 ---
 
@@ -83,7 +87,7 @@ http://localhost:3001/movies/watch/{tmdbId}?episodeNumber={episodeNumber}&season
 **GET**
 
 ```
-http://localhost:3001/movies/server/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}
+http://localhost:3001/movies/tmdb/server/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}
 ```
 
 #### Query Parameters

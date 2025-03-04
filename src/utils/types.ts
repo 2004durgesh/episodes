@@ -7,7 +7,6 @@ export interface EpisodeTitle {
   [key: string]: string | undefined;
 }
 
-
 // Episode export Interface
 export interface Episode {
   title: EpisodeTitle;
@@ -37,13 +36,15 @@ export interface Mappings {
   [key: string]: string | undefined;
 }
 
+export type MetaProvider = "anilist" | "mal";
+
 export interface Source {
   server: string;
   sources: IVideo[];
   subtitles?: ISubtitle[];
 }
 
-export interface Server{
+export interface Server {
   name: string;
   url: string;
 }
