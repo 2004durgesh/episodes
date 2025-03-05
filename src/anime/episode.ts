@@ -54,7 +54,7 @@ export const fetchEpisodesData = async (
 ): Promise<UnifiedEpisode[]> => {
   // Run mappings and meta fetch in parallel
   const [mappings, episodeMeta] = await Promise.all([
-    getMappings(id, metaProvider, preferredProvider || ""),
+    getMappings(id, metaProvider),
     fetchEpisodeMeta(id, metaProvider),
   ]);
 

@@ -1,6 +1,11 @@
 import { IAnimeInfo, ITitle } from "@consumet/extensions";
 import { AnimeInfoAnilist } from "../lib/Anilistfunctions";
-import { getProvider } from "../providers/index";
+import {
+  getProvider,
+  GogoAnimeProvider,
+  AnimeKaiProvider,
+  ZoroProvider,
+} from "../providers/index";
 import { Mappings, MetaProvider } from "../utils/types";
 import axios from "axios";
 
@@ -15,8 +20,7 @@ interface MappingResponse {
 
 export async function getMappings(
   id: string,
-  metaProvider: MetaProvider,
-  provider: string
+  metaProvider: MetaProvider
 ): Promise<MappingResponse | null> {
   try {
     let data;
@@ -25,32 +29,23 @@ export async function getMappings(
     let animekaires;
     if (metaProvider === "anilist") {
       data = await getAnilistInfo(id);
-      gogores = await mapGogo(data?.title as ITitle, provider);
-      zorores = await mapZoro(data?.title as ITitle, provider);
-      animekaires = await mapAnimekai(data?.title as ITitle, provider);
+      gogores = await mapGogo(data?.title as ITitle);
+      zorores = await mapZoro(data?.title as ITitle);
+      animekaires = await mapAnimekai(data?.title as ITitle);
     } else {
       data = await getMalInfo(id);
-      gogores = await mapGogo(
-        {
-          romaji: data?.data?.title,
-          english: data?.data.title_english,
-        } as ITitle,
-        provider
-      );
-      zorores = await mapZoro(
-        {
-          romaji: data?.data?.title,
-          english: data?.data.title_english,
-        } as ITitle,
-        provider
-      );
-      animekaires = await mapAnimekai(
-        {
-          romaji: data?.data?.title,
-          english: data?.data.title_english,
-        } as ITitle,
-        provider
-      );
+      gogores = await mapGogo({
+        romaji: data?.data?.title,
+        english: data?.data.title_english,
+      } as ITitle);
+      zorores = await mapZoro({
+        romaji: data?.data?.title,
+        english: data?.data.title_english,
+      } as ITitle);
+      animekaires = await mapAnimekai({
+        romaji: data?.data?.title,
+        english: data?.data.title_english,
+      } as ITitle);
     }
     if (!data) {
       return null;
@@ -90,23 +85,14 @@ async function getMalInfo(id: string): Promise<IAnimeInfo | null> {
   }
 }
 
-async function mapGogo(
-  title: ITitle,
-  provider: string
-): Promise<Mappings | null> {
-  return await getProvider(provider).getMapping(title);
+async function mapGogo(title: ITitle): Promise<Mappings | null> {
+  return await new GogoAnimeProvider().getMapping(title);
 }
 
-async function mapZoro(
-  title: ITitle,
-  provider: string
-): Promise<Mappings | null> {
-  return await getProvider(provider).getMapping(title);
+async function mapZoro(title: ITitle): Promise<Mappings | null> {
+  return await new ZoroProvider().getMapping(title);
 }
 
-async function mapAnimekai(
-  title: ITitle,
-  provider: string
-): Promise<Mappings | null> {
-  return await getProvider(provider).getMapping(title);
+async function mapAnimekai(title: ITitle): Promise<Mappings | null> {
+  return await new AnimeKaiProvider().getMapping(title);
 }

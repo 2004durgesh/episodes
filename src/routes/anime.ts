@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { getProvider } from "../providers";
 import { fetchEpisodeMeta, fetchEpisodesData } from "../anime/episode";
+import { getMappings } from "../anime/mappings";
 
 const router = express.Router();
 
@@ -42,7 +43,11 @@ router.get("/mappings/:idType/:id", async (req: any, res: any) => {
       });
     }
     const mappings = await fetchEpisodeMeta(id, idType);
-    res.status(200).json(mappings.mappings);
+    const providerMappings = await getMappings(
+      id,
+      idType === "mal_id" ? "mal" : "anilist"
+    );
+    res.status(200).json({ ...mappings.mappings, ...providerMappings });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({
