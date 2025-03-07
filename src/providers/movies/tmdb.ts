@@ -1,19 +1,26 @@
 import {
   IAnimeResult,
+  IEpisodeServer,
   IMovieEpisode,
   IMovieInfo,
   ISearch,
+  ISource,
   META,
+  MixDrop,
   PROVIDERS_LIST,
+  StreamingServers,
   TvType,
+  VidCloud,
 } from "@consumet/extensions";
 import { Provider } from "../base";
-import { FetchSourcesAndServers, Server, Source } from "../../utils/types";
+import { Source } from "../../utils/types";
 import { allGetStream } from "../../extractors";
 import axios from "axios";
 import { compareTwoStrings } from "../../utils/utils";
+import { getRiveEmbedStream } from "../../extractors/rive-embed";
+import { StreamTape, StreamWish, VidMoly, Voe } from "@consumet/extensions/dist/extractors";
 
-const allowedServers: string[] = [
+const workingNonEmbedServers: string[] = [
   "hydrax",
   "fastx",
   "filmecho",
@@ -219,7 +226,9 @@ export class TMDBProvider extends Provider {
           info.seasons = [];
           info.seasons.push({
             season: 1,
-            image: !data?.poster_path?undefined:`https://image.tmdb.org/t/p/w780${data.backdrop_path}`,
+            image: !data?.poster_path
+              ? undefined
+              : `https://image.tmdb.org/t/p/w780${data.backdrop_path}`,
             episodes: [
               {
                 id: `${id}-${type}-s1-e1`,
@@ -253,51 +262,137 @@ export class TMDBProvider extends Provider {
     episodeNumber: string,
     seasonNumber: string,
     type: string,
-    server: string
+    server: string,
+    embed: boolean
   ): Promise<Source> {
-    const id = {
-      tmdbId: episodeId,
-      season: seasonNumber,
-      episode: episodeNumber,
-    };
-    // console.log(id, type);
-    const stream = await allGetStream(JSON.stringify(id), type);
-      return stream.filter((stream) =>
-        stream.server.toLowerCase() === server.toLowerCase()
-      )[0]
+    if (embed) {
+      const servers = await this.fetchEpisodeServers(
+        episodeId,
+        episodeNumber,
+        seasonNumber,
+        type,
+        embed
+      );
+      const index = servers.findIndex(
+        (s) => s.name.toLowerCase() === server.toLowerCase()
+      );
+      const serverUrl = new URL(servers[index].url);
+      console.log(servers[index]);
+      switch (server.split("-")[0]) {
+        case StreamingServers.MixDrop:
+          return {
+            headers: { Referer: serverUrl.href },
+            sources: await new MixDrop().extract(serverUrl),
+          };
+        case StreamingServers.VidCloud:
+          return {
+            headers: { Referer: serverUrl.href },
+            ...(await new VidCloud().extract(serverUrl)),
+          };
+        case StreamingServers.StreamWish:
+          return {
+            headers: { Referer: serverUrl.href },
+            ...(await new StreamWish().extract(serverUrl)),
+          };
+        case StreamingServers.Voe:
+          return {
+            headers: { Referer: serverUrl.href },
+            ...(await new Voe().extract(serverUrl)),
+          };
+        case StreamingServers.VidMoly:
+          return {
+            headers: { Referer: serverUrl.href },
+            sources: await new VidMoly().extract(serverUrl),
+          };
+        case StreamingServers.StreamTape:
+          return {
+            headers: { Referer: serverUrl.href },
+            sources: await new StreamTape().extract(serverUrl),
+          };
+        default:
+          return {
+            headers: { Referer: serverUrl.href },
+            sources: await new MixDrop().extract(serverUrl),
+          };
+      }
+    } else {
+      const stream = await allGetStream(
+        episodeId,
+        episodeNumber,
+        seasonNumber,
+        type
+      );
+      return stream.filter(
+        (stream) => stream?.server!.toLowerCase() === server.toLowerCase()
+      )[0];
+    }
   }
 
   async fetchEpisodeServers(
     episodeId: string,
     episodeNumber: string,
     seasonNumber: string,
-    type: string
-  ): Promise<Server[]> {
-    const id = {
-      tmdbId: episodeId,
-      season: seasonNumber,
-      episode: episodeNumber,
-    };
-    const stream = await allGetStream(JSON.stringify(id), type);
-    const serverUrls = stream.map(s => ({
-      name: s.server,
-      url: s.sources[0].url
-    }));
-
-    const validServers = await Promise.all(
-      serverUrls.map(async (server) => {
-      try {
-        await axios.head(server.url);
-        return server;
-      } catch (error) {
-        return null;
-      }
-      })
+    type: string,
+    embed: boolean
+  ): Promise<IEpisodeServer[]> {
+    const stream = await allGetStream(
+      episodeId,
+      episodeNumber,
+      seasonNumber,
+      type
     );
+    if (embed) {
+      const stream = await getRiveEmbedStream(
+        episodeId,
+        episodeNumber,
+        seasonNumber,
+        type
+      );
+      const workingEmbedServers = [
+        "mixdrop",
+        "pepepeyo",
+        "zizicoi",
+        "hanatyury",
+        "streamtape",
+        "streamwish",
+        "vidmoly",
+        "voe",
+      ];
+      return stream
+        ?.filter((item: { host: string; link: string }) =>
+          workingEmbedServers.some((server) => item?.host?.includes(server))
+        )
+        .map((item: { host: string; link: string }, index) => ({
+          name:
+            item.host.includes("zizicoi") ||
+            item.host.includes("pepepeyo") ||
+            item.host.includes("hanatyury")
+              ? `vidcloud-${index}`
+              : `${item.host.split(".")[0]}-${index}`,
+          url: item.link,
+        }));
+    } else {
+      const serverUrls = stream.map((s) => ({
+        name: s.server,
+        url: s.sources[0].url,
+      }));
 
-    return validServers.filter((server): server is { name: string, url: string } => 
-      server !== null
-    );
+      const validServers = await Promise.all(
+        serverUrls.map(async (server) => {
+          try {
+            await axios.head(server.url);
+            return server;
+          } catch (error) {
+            return null;
+          }
+        })
+      );
+
+      return validServers.filter(
+        (server): server is { name: string; url: string } => server !== null
+      );
+    }
+    return [];
   }
 
   private findIdFromTitle = async (

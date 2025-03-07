@@ -39,20 +39,18 @@ export interface Mappings {
 export type MetaProvider = "anilist" | "mal";
 
 export interface Source {
-  server: string;
-  sources: IVideo[];
-  subtitles?: ISubtitle[];
-}
-
-export interface Server {
-  name: string;
-  url: string;
-}
-
-export interface FetchSourcesAndServers {
-  tmdbId: string;
-  episodeNumber: string;
-  seasonNumber: string;
-  type: string;
   server?: string;
+  headers?: {
+    [k: string]: string;
+  };
+  subtitles?: ISubtitle[];
+  sources: IVideo[];
+  download?: string;
+  embedURL?: string;
+}
+
+export interface RiveEmbedSource {
+  link: string;
+  host: string;
+  host_id: string;
 }

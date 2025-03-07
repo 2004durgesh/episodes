@@ -58,7 +58,7 @@ router.get("/episodes/:id", async (req: any, res: any) => {
 router.get("/watch/:tmdbId", async (req: any, res: any) => {
   try {
     const { tmdbId } = req.params;
-    const { type, episodeNumber, seasonNumber, server } = req.query;
+    const { type, episodeNumber, seasonNumber, server, embed } = req.query;
 
     if (!tmdbId) {
       return res.status(400).json({
@@ -75,12 +75,14 @@ router.get("/watch/:tmdbId", async (req: any, res: any) => {
       });
     }
 
+
     const streams = await getProvider("tmdb").fetchEpisodeSources(
       tmdbId,
       episodeNumber as string,
       seasonNumber as string,
       type as string,
-      server as string
+      server as string,
+      embed !== "false" && embed !== "0"
     );
     return res.status(200).json(streams);
   } catch (error) {
@@ -95,7 +97,7 @@ router.get("/watch/:tmdbId", async (req: any, res: any) => {
 router.get("/server/:tmdbId", async (req: any, res: any) => {
   try {
     const { tmdbId } = req.params;
-    const { type, episodeNumber, seasonNumber } = req.query;
+    const { type, episodeNumber, seasonNumber,embed } = req.query;
 
     if (!tmdbId) {
       return res.status(400).json({
@@ -115,7 +117,8 @@ router.get("/server/:tmdbId", async (req: any, res: any) => {
       tmdbId,
       episodeNumber as string,
       seasonNumber as string,
-      type as string
+      type as string,
+      embed !== "false" && embed !== "0"
     );
     return res.status(200).json(server);
   } catch (error) {

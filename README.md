@@ -74,23 +74,46 @@ http://localhost:3001/movies/episodes/{tmdbId}?type={movie} # or tv
 ---
 
 ### 🎯 Fetch Streaming Links (only for movies endpoint)
+> [!NOTE]  
+> Defaults to embed=true 
 
+#### Non-Embed Links
 **GET**
 
 ```
-http://localhost:3001/movies/tmdb/watch/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&server={server}
+http://localhost:3001/movies/tmdb/watch/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&server={server}&embed=false
+```
+---
+
+#### Embed Links
+**GET**
+
+```
+http://localhost:3001/movies/tmdb/watch/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&server={server}&embed=true
 ```
 ---
 
 ### 🎯 Fetch Servers (only for movies endpoint)
+> [!NOTE]  
+> Defaults to embed=true 
 
+#### Non-Embed Servers
 **GET**
 
 ```
-http://localhost:3001/movies/tmdb/server/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}
+http://localhost:3001/movies/tmdb/server/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&embed=false
 ```
+---
+
+#### Embed Servers
+**GET**
+
+```
+http://localhost:3001/movies/tmdb/server/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&embed=true
+```
+---
+
 
 #### Query Parameters
 
 - **type**: `movie` or `tv`
-- **server**: `"hydrax", "fastx", "filmecho", "nova", "guru", "g1", "g2", "ee3", "ghost", "putafilme", "asiacloud", "kage", "multi", "stable"`
