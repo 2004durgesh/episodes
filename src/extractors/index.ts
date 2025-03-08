@@ -6,13 +6,14 @@ import axios from "axios";
 
 const autoembed = "YXV0b2VtYmVkLmNj";
 export const allGetStream = async (
-  id: string,
+  tmdbId: string,
+  episode: string,
+  season: string,
   type: string
 ): Promise<Source[]> => {
   try {
     // console.log(id);
     const streams: Source[] = [];
-    const { season, episode, tmdbId } = JSON.parse(id);
 
     ///// rive
     await getRiveNonEmbedStream(tmdbId, episode, season, type, streams);

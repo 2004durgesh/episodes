@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Source } from "../utils/types";
+import { RiveEmbedSource, Source } from "../utils/types";
 import { ISubtitle, MixDrop, VidCloud } from "@consumet/extensions";
 import { generateSecretKey } from "../utils/utils";
 import { Filemoon, StreamTape, StreamWish, VidMoly, Voe } from "@consumet/extensions/dist/extractors";
@@ -9,7 +9,7 @@ export async function getRiveEmbedStream(
   episode: string,
   season: string,
   type: string
-) {
+): Promise<RiveEmbedSource[]> {
   const secret = generateSecretKey(Number(tmdbId));
   const baseUrl = "https://rivestream.net";
   // console.log(tmdbId, episode, season, type);
@@ -20,20 +20,23 @@ export async function getRiveEmbedStream(
       : `/api/backendfetch?requestID=movieEmbedProvider&id=${tmdbId}&secretKey=${secret}&service=`;
   const url = baseUrl + route;
   const { data } = await axios.get(url);
+  const sources:RiveEmbedSource[] =[]
   await Promise.all(
     data.data.map(async (service: string) => {
-    //   console.log(`Rive: ${service}` + baseUrl + serviceRoute + service);
+      // console.log(`Rive: ${service}`);
       const url = baseUrl + serviceRoute + service;
       try {
         const { data } = await axios.get(url);
         // console.log("Rive res: ", data.data.sources);
-        return data.data.sources
+          sources.push(...data.data.sources);
+        // return data.data.sources
       } catch (e) {
         // console.log(e);
         throw new Error("Rive Error");
       }
     })
   );
+  return sources
 }
 
 getRiveEmbedStream("108978", "1", "1", "series");

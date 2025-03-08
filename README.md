@@ -37,15 +37,32 @@ npm run dev
 **GET**
 
 ```sh
-http://localhost:3001/anime/mappings/{anilistId}
+http://localhost:3001/anime/mappings/{idType}/{id}
 ```
+
+Supported ID types:
+- anilist_id
+- mal_id
+- kitsu_id
+- animeplanet_id
+- anisearch_id
+- anidb_id
+- notifymoe_id
+- livechart_id
+- thetvdb_id
+- imdb_id
+- themoviedb_id
 
 ### 🎯 Fetch Episodes
 
 **GET**
 
 ```sh
-http://localhost:3001/anime/episodes/{anilistId}?provider=gogoanime # or zoro
+http://localhost:3001/anime/episodes/anilist/{anilistId}?provider=gogoanime # or zoro | animekai
+```
+
+```sh
+http://localhost:3001/anime/episodes/mal/{malId}?provider=gogoanime # or zoro | animekai
 ```
 
 **GET**
@@ -57,23 +74,46 @@ http://localhost:3001/movies/episodes/{tmdbId}?type={movie} # or tv
 ---
 
 ### 🎯 Fetch Streaming Links (only for movies endpoint)
+> [!NOTE]  
+> Defaults to embed=true 
 
+#### Non-Embed Links
 **GET**
 
 ```
-http://localhost:3001/movies/watch/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&server={server}
+http://localhost:3001/movies/tmdb/watch/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&server={server}&embed=false
+```
+---
+
+#### Embed Links
+**GET**
+
+```
+http://localhost:3001/movies/tmdb/watch/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&server={server}&embed=true
 ```
 ---
 
 ### 🎯 Fetch Servers (only for movies endpoint)
+> [!NOTE]  
+> Defaults to embed=true 
 
+#### Non-Embed Servers
 **GET**
 
 ```
-http://localhost:3001/movies/server/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}
+http://localhost:3001/movies/tmdb/server/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&embed=false
 ```
+---
+
+#### Embed Servers
+**GET**
+
+```
+http://localhost:3001/movies/tmdb/server/{tmdbId}?episodeNumber={episodeNumber}&seasonNumber={seasonNumber}&type={type}&embed=true
+```
+---
+
 
 #### Query Parameters
 
 - **type**: `movie` or `tv`
-- **server**: `"hydrax", "fastx", "filmecho", "nova", "guru", "g1", "g2", "ee3", "ghost", "putafilme", "asiacloud", "kage", "multi", "stable"`

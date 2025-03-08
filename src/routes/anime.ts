@@ -1,26 +1,53 @@
 import express, { Request, Response } from "express";
 import { getProvider } from "../providers";
 import { fetchEpisodeMeta, fetchEpisodesData } from "../anime/episode";
+import { getMappings } from "../anime/mappings";
 
 const router = express.Router();
 
 router.get("/", (req: Request, res: Response) => {
-  res.json([{ routes: ["/episodes/:id"] }]);
+  res.json([{ routes: ["/episodes/:id", "/mappings/:idType/:id"] }]);
 });
 
-router.get("/mappings/:id", async (req: any, res: any) => {
+router.get("/mappings/:idType/:id", async (req: any, res: any) => {
   try {
-    const { id } = req.params;
+    const { idType, id } = req.params;
 
-    if (!id) {
+    if (!idType || !id) {
       return res.status(400).json({
         success: false,
-        error: "Missing required ID parameter",
+        error: "Missing required parameters: idType and id",
       });
     }
 
-    const mappings = await fetchEpisodeMeta(id);
-    res.status(200).json(mappings.mappings);
+    const supportedTypes = [
+      "anilist_id",
+      "mal_id",
+      "kitsu_id",
+      "animeplanet_id",
+      "anisearch_id",
+      "anidb_id",
+      "notifymoe_id",
+      "livechart_id",
+      "thetvdb_id",
+      "imdb_id",
+      "themoviedb_id",
+    ];
+
+    if (!supportedTypes.includes(idType)) {
+      return res.status(400).json({
+        success: false,
+        error: `Unsupported ID type: ${idType}, supported types: ${supportedTypes.join(
+          ", "
+        )}`,
+      });
+    }
+    const mappings = await fetchEpisodeMeta(id, idType);
+    const providerMappings = await getMappings(
+      id,
+      idType === "mal_id" ? "mal" : "anilist"
+    );
+    res.status(200).json({ ...mappings.mappings, ...providerMappings });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({
@@ -30,15 +57,15 @@ router.get("/mappings/:id", async (req: any, res: any) => {
   }
 });
 
-router.get("/episodes/:id", async (req: any, res: any) => {
+router.get("/episodes/:metaProvider/:id", async (req: any, res: any) => {
   try {
-    const { id } = req.params;
+    const { metaProvider, id } = req.params;
     const { provider } = req.query;
 
-    if (!id) {
+    if (!id || !metaProvider) {
       return res.status(400).json({
         success: false,
-        error: "Missing required ID parameter",
+        error: "Missing required id or metaProvider parameter",
       });
     }
 
@@ -53,6 +80,7 @@ router.get("/episodes/:id", async (req: any, res: any) => {
     }
     const episodesData = await fetchEpisodesData(
       id,
+      metaProvider,
       (provider as string) || "zoro"
     );
 
