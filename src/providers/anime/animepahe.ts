@@ -3,11 +3,11 @@ import { Provider } from "../base";
 import { findSimilarTitles } from "../../lib/stringSimilarity";
 import { Mappings } from "../../utils/types";
 
-export class AnimeKaiProvider extends Provider {
+export class AnimePaheProvider extends Provider {
   constructor() {
-    super("animekai");
+    super("animepahe");
   }
-  client = new ANIME.AnimeKai();
+  client = new ANIME.AnimePahe();
   async fetchEpisodes(id: string): Promise<IAnimeEpisode[]> {
     try {
       const data = await this.client.fetchAnimeInfo(id);
@@ -69,7 +69,7 @@ export class AnimeKaiProvider extends Provider {
       return mappings;
     } catch (error) {
       console.error(
-        "Error in getMapping from animekai :",
+        "Error in getMapping from animepahe :",
         error,
         error instanceof Error ? error.message : "Unknown error"
       );
