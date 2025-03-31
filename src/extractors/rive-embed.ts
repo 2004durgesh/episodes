@@ -31,7 +31,7 @@ export async function getRiveEmbedStream(
           sources.push(...data.data.sources);
         // return data.data.sources
       } catch (e) {
-        // console.log(e);
+        console.log(e);
         throw new Error("Rive Error");
       }
     })
