@@ -6,7 +6,7 @@ import {
   AnimeKaiProvider,
   ZoroProvider,
   AnimePaheProvider,
-} from "../providers/index";
+} from "../providers";
 import { Mappings, MetaProvider } from "../utils/types";
 import axios from "axios";
 
