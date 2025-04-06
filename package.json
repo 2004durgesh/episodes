@@ -6,7 +6,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@consumet/extensions": "file:../consumet.ts",
+    "@consumet/extensions": "github:consumet/consumet.ts",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
