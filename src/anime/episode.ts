@@ -1,4 +1,4 @@
-import { getProvider } from "../providers/index";
+import { getProvider } from "../providers";
 import { CombineEpisodeMeta, EpisodeSchema } from "../utils/EpisodeFunctions";
 import { MetaProvider } from "../utils/types";
 import { getMappings } from "./mappings";
