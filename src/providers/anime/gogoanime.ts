@@ -9,7 +9,7 @@ export class GogoAnimeProvider extends Provider {
   constructor() {
     super("gogoanime");
   }
-  client = new ANIME.Gogoanime();
+  client = new ANIME.Gogoanime(process.env.GOGOANIME_URL);
   async fetchEpisodes(id: string): Promise<IAnimeEpisode[]> {
     try {
       const data = await this.client.fetchAnimeInfo(id);

@@ -8,8 +8,9 @@ import {
 export class ZoroProvider extends Provider {
   constructor() {
     super("zoro");
+    // console.log("curl",process.env,typeof process.env.ZORO_URL);
   }
-  client = new ANIME.Zoro();
+  client = new ANIME.Zoro(process.env.ZORO_URL);
 
   async fetchEpisodes(id: string): Promise<IAnimeEpisode[]> {
     try {
