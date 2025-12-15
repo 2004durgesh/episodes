@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { getProvider } from "../providers";
-import { fetchEpisodeMeta, fetchEpisodesData } from "../anime/episode";
-import { getMappings } from "../anime/mappings";
+import { fetchEpisodeMeta, fetchEpisodesData } from "../episode";
+import { getMappings } from "../mappings";
 
 const router = express.Router();
 
@@ -47,7 +47,13 @@ router.get("/mappings/:idType/:id", async (req: any, res: any) => {
       id,
       idType === "mal_id" ? "mal" : "anilist"
     );
-    res.status(200).json({ ...mappings.mappings, ...providerMappings });
+    res
+      .status(200)
+      .json({
+        ...mappings.mappings,
+        ...providerMappings,
+        artwork: mappings.artwork,
+      });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({

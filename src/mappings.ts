@@ -1,11 +1,7 @@
 import { IAnimeInfo, ITitle } from "@consumet/extensions";
-import { AnimeInfoAnilist } from "../lib/Anilistfunctions";
-import {
-  AnimeKaiProvider,
-  ZoroProvider,
-  AnimePaheProvider,
-} from "../providers";
-import { MappingExtraData, Mappings, MetaProvider } from "../utils/types";
+import { AnimeInfoAnilist } from "./lib/Anilistfunctions";
+import { AnimeKaiProvider, ZoroProvider, AnimePaheProvider } from "./providers";
+import { MappingExtraData, Mappings, MetaProvider } from "./utils/types";
 import axios from "axios";
 
 interface MappingResponse {
@@ -17,25 +13,25 @@ interface MappingResponse {
   title?: string;
 }
 
-function getMalStartYear(aired:any): number | null {
+function getMalStartYear(aired: any): number | null {
   // 1️⃣ Try ISO date: aired.from
   if (aired?.from) {
-    const year = new Date(aired.from).getFullYear()
-    if (!isNaN(year)) return year
+    const year = new Date(aired.from).getFullYear();
+    if (!isNaN(year)) return year;
   }
 
   // 2️⃣ Try parsing from string (e.g. "Oct 5, 2014")
   if (aired?.string) {
-    const match = aired.string.match(/\b(19|20)\d{2}\b/)
-    if (match) return Number(match[0])
+    const match = aired.string.match(/\b(19|20)\d{2}\b/);
+    if (match) return Number(match[0]);
   }
 
   // 3️⃣ Fallback to prop.from.year
   if (aired?.prop?.from?.year) {
-    return aired.prop.from.year
+    return aired.prop.from.year;
   }
 
-  return null
+  return null;
 }
 
 export async function getMappings(
@@ -125,7 +121,6 @@ async function getAnilistInfo(id: string): Promise<IAnimeInfo | null> {
 async function getMalInfo(id: string): Promise<IAnimeInfo | null> {
   try {
     const { data } = await axios.get(`https://api.jikan.moe/v4/anime/${id}`);
-    console.log(`https://api.jikan.moe/v4/anime/${id}`)
     return data ?? null;
   } catch (error) {
     console.error("Error getting anime info:", error);

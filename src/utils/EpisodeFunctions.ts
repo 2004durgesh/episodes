@@ -1,4 +1,4 @@
-import { MetaResponse, UnifiedEpisode } from "../anime/episode";
+import { MetaResponse, UnifiedEpisode } from "../episode";
 
 export interface EpisodeSchema {
   number: number;
@@ -65,7 +65,7 @@ export async function CombineEpisodeMeta(
         episodeImages[episodeNum].overview ||
         episodeImages[episodeNum].summary;
 
-      Object.assign(episode, { image, title, description, airDate});
+      Object.assign(episode, { image, title, description, airDate });
     }
   }
   return episodeData;
