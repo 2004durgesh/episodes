@@ -2,6 +2,8 @@ export const animeinfo: string = `
   query($id: Int) {
     Media(id: $id) {
       idMal
+      type
+      format
       externalLinks {
         site
         url

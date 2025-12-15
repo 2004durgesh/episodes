@@ -1,4 +1,4 @@
-import { ISubtitle, IVideo } from "@consumet/extensions";
+import { ISubtitle, ITitle, IVideo } from "@consumet/extensions";
 
 export interface EpisodeTitle {
   "x-jat"?: string;
@@ -34,6 +34,22 @@ export interface Mappings {
   dub?: string;
   uncensored?: string;
   [key: string]: string | undefined;
+}
+
+export interface MappingExtraData {
+  /** AniList: Media.format (e.g. TV, MOVIE, OVA, ONA, SPECIAL) */
+  format?: string;
+  /** Best-effort release year (AniList startDate.year, MAL year, etc.) */
+  startYear?: number | null;
+  /** Optional meta hint if available */
+  mediaType?: string;
+  /** Optional episode count hint if available */
+  episodes?: number;
+}
+
+export interface getMappingParams {
+  title: ITitle;
+  extraData: MappingExtraData;
 }
 
 export type MetaProvider = "anilist" | "mal";

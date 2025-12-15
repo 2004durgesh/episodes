@@ -1,7 +1,7 @@
 import { ANIME, IAnimeEpisode, ITitle } from "@consumet/extensions";
 import { Provider } from "../base";
 import { findSimilarTitles } from "../../lib/stringSimilarity";
-import { Mappings } from "../../utils/types";
+import { MappingExtraData, Mappings } from "../../utils/types";
 
 export class ZoroProvider extends Provider {
   constructor() {
@@ -22,7 +22,10 @@ export class ZoroProvider extends Provider {
     }
   }
 
-  async getMapping(title: ITitle): Promise<Mappings> {
+  async getMapping(
+    title: ITitle,
+    extraData?: MappingExtraData
+  ): Promise<Mappings> {
     try {
       // Run searches in parallel
       const searchTerm =
@@ -32,6 +35,7 @@ export class ZoroProvider extends Provider {
       if (!searchResults?.results) {
         return {};
       }
+      searchResults.results = searchResults.results.filter((item)=>item.type?.toLowerCase()===extraData?.format?.toLowerCase())
       // Run similar title searches in parallel
       const [mappedEng, mappedRom] = await Promise.all([
         Promise.resolve(
