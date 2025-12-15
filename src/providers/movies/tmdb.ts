@@ -6,11 +6,9 @@ import {
   ISearch,
   ISource,
   META,
-  MixDrop,
   PROVIDERS_LIST,
   StreamingServers,
   TvType,
-  VidCloud,
 } from "@consumet/extensions";
 import { Provider } from "../base";
 import { Source } from "../../utils/types";
@@ -279,16 +277,6 @@ export class TMDBProvider extends Provider {
       const serverUrl = new URL(servers[index].url);
       console.log(servers[index]);
       switch (server.split("-")[0]) {
-        case StreamingServers.MixDrop:
-          return {
-            headers: { Referer: serverUrl.href },
-            sources: await new MixDrop().extract(serverUrl),
-          };
-        case StreamingServers.VidCloud:
-          return {
-            headers: { Referer: serverUrl.href },
-            ...(await new VidCloud().extract(serverUrl)),
-          };
         case StreamingServers.StreamWish:
           return {
             headers: { Referer: serverUrl.href },
@@ -312,7 +300,7 @@ export class TMDBProvider extends Provider {
         default:
           return {
             headers: { Referer: serverUrl.href },
-            sources: await new MixDrop().extract(serverUrl),
+           ...(await new StreamWish().extract(serverUrl)),
           };
       }
     } else {

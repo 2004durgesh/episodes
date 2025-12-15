@@ -1,16 +1,13 @@
 import { ANIME, IAnimeEpisode, ITitle } from "@consumet/extensions";
 import { Provider } from "../base";
 import { findSimilarTitles } from "../../lib/stringSimilarity";
-import {
-  Mappings,
-} from "../../utils/types";
+import { Mappings } from "../../utils/types";
 
 export class ZoroProvider extends Provider {
   constructor() {
     super("zoro");
-    // console.log("curl",process.env,typeof process.env.ZORO_URL);
   }
-  client = new ANIME.Zoro(process.env.ZORO_URL);
+  client = new ANIME.Hianime();
 
   async fetchEpisodes(id: string): Promise<IAnimeEpisode[]> {
     try {
@@ -35,7 +32,6 @@ export class ZoroProvider extends Provider {
       if (!searchResults?.results) {
         return {};
       }
-
       // Run similar title searches in parallel
       const [mappedEng, mappedRom] = await Promise.all([
         Promise.resolve(
@@ -45,15 +41,15 @@ export class ZoroProvider extends Provider {
           findSimilarTitles(title?.romaji || "", searchResults.results)
         ),
       ]);
-
       // Use Set for efficient deduplication
-            const uniqueResults = Array.from(
-          new Set([...mappedEng, ...mappedRom].map(item => JSON.stringify(item)))
-      ).map(str => JSON.parse(str));
+      const uniqueResults = Array.from(
+        new Set(
+          [...mappedEng, ...mappedRom].map((item) => JSON.stringify(item))
+        )
+      ).map((str) => JSON.parse(str));
 
       // Sort by similarity score
       uniqueResults.sort((a, b) => (b.similarity || 0) - (a.similarity || 0));
-
       // Single pass mapping
       const mappings: Mappings = {};
       for (const obj of uniqueResults) {
@@ -67,7 +63,6 @@ export class ZoroProvider extends Provider {
         // Early return if we have both sub and dub
         if (mappings.sub && mappings.dub) break;
       }
-
       return mappings;
     } catch (error) {
       console.error(
@@ -77,5 +72,4 @@ export class ZoroProvider extends Provider {
       return {};
     }
   }
-
 }

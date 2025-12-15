@@ -1,8 +1,6 @@
 import { IAnimeInfo, ITitle } from "@consumet/extensions";
 import { AnimeInfoAnilist } from "../lib/Anilistfunctions";
 import {
-  getProvider,
-  GogoAnimeProvider,
   AnimeKaiProvider,
   ZoroProvider,
   AnimePaheProvider,
@@ -11,7 +9,6 @@ import { Mappings, MetaProvider } from "../utils/types";
 import axios from "axios";
 
 interface MappingResponse {
-  gogoanime: Mappings | null;
   zoro: Mappings | null;
   animekai: Mappings | null;
   animepahe: Mappings | null;
@@ -26,22 +23,16 @@ export async function getMappings(
 ): Promise<MappingResponse | null> {
   try {
     let data;
-    let gogores;
     let zorores;
     let animekaires;
     let animepaheres;
     if (metaProvider === "anilist") {
       data = await getAnilistInfo(id);
-      gogores = await mapGogo(data?.title as ITitle);
       zorores = await mapZoro(data?.title as ITitle);
       animekaires = await mapAnimekai(data?.title as ITitle);
       animepaheres = await mapAnimepahe(data?.title as ITitle);
     } else {
       data = await getMalInfo(id);
-      gogores = await mapGogo({
-        romaji: data?.data?.title,
-        english: data?.data.title_english,
-      } as ITitle);
       zorores = await mapZoro({
         romaji: data?.data?.title,
         english: data?.data.title_english,
@@ -60,7 +51,6 @@ export async function getMappings(
     }
 
     return {
-      gogoanime: gogores,
       zoro: zorores,
       animekai: animekaires,
       animepahe:animepaheres,
@@ -94,9 +84,6 @@ async function getMalInfo(id: string): Promise<IAnimeInfo | null> {
   }
 }
 
-async function mapGogo(title: ITitle): Promise<Mappings | null> {
-  return await new GogoAnimeProvider().getMapping(title);
-}
 
 async function mapZoro(title: ITitle): Promise<Mappings | null> {
   return await new ZoroProvider().getMapping(title);

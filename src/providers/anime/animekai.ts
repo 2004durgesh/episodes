@@ -7,7 +7,7 @@ export class AnimeKaiProvider extends Provider {
   constructor() {
     super("animekai");
   }
-  client = new ANIME.AnimeKai(process.env.ANIMEKAI_URL);
+  client = new ANIME.AnimeKai();
   async fetchEpisodes(id: string): Promise<IAnimeEpisode[]> {
     try {
       const data = await this.client.fetchAnimeInfo(id);

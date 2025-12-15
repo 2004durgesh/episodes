@@ -58,11 +58,11 @@ Supported ID types:
 **GET**
 
 ```sh
-http://localhost:3001/anime/episodes/anilist/{anilistId}?provider=gogoanime # or zoro | animekai | animepahe
+http://localhost:3001/anime/episodes/anilist/{anilistId}?provider=zoro # or animekai | animepahe
 ```
 
 ```sh
-http://localhost:3001/anime/episodes/mal/{malId}?provider=gogoanime # or zoro | animekai | animepahe
+http://localhost:3001/anime/episodes/mal/{malId}?provider=zoro # or animekai | animepahe
 ```
 
 **GET**
