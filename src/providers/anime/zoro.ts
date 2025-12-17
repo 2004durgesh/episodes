@@ -2,6 +2,7 @@ import { ANIME, IAnimeEpisode, ITitle } from "@consumet/extensions";
 import { Provider } from "../base";
 import { findSimilarTitles } from "../../lib/stringSimilarity";
 import { MappingExtraData, Mappings } from "../../utils/types";
+import { fetchAllSearchResults } from "../utils/paginatedSearch";
 
 export class ZoroProvider extends Provider {
   constructor() {
@@ -27,22 +28,30 @@ export class ZoroProvider extends Provider {
     extraData?: MappingExtraData
   ): Promise<Mappings> {
     try {
-      // Run searches in parallel
       const searchTerm =
         title?.romaji || title?.english || title?.userPreferred || "";
-      const searchResults = await this.client.search(searchTerm);
+      const allResults = await fetchAllSearchResults(
+        (q, page) => this.client.search(q, page),
+        searchTerm
+      );
 
-      if (!searchResults?.results) {
+      if (allResults.length === 0) {
         return {};
       }
-      searchResults.results = searchResults.results.filter((item)=>item.type?.toLowerCase()===extraData?.format?.toLowerCase())
+
+      // Optional format filter (only if format is provided)
+      const format = extraData?.format?.toLowerCase();
+      const filteredResults = format
+        ? allResults.filter((item) => item?.type?.toLowerCase?.() === format)
+        : allResults;
+
       // Run similar title searches in parallel
       const [mappedEng, mappedRom] = await Promise.all([
         Promise.resolve(
-          findSimilarTitles(title?.english || "", searchResults.results)
+          findSimilarTitles(title?.english || "", filteredResults)
         ),
         Promise.resolve(
-          findSimilarTitles(title?.romaji || "", searchResults.results)
+          findSimilarTitles(title?.romaji || "", filteredResults)
         ),
       ]);
       // Use Set for efficient deduplication
